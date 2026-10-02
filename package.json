@@ -1,0 +1,77 @@
+{
+  "name": "andify",
+  "version": "1.0.3",
+  "description": "Andify, tu musica en un reproductor propio",
+  "main": "main.js",
+  "author": "Andify",
+  "license": "MIT",
+  "scripts": {
+    "start": "node prepare.js && electron .",
+    "dist": "node prepare.js && electron-builder --win nsis --x64 --publish never",
+    "dist:mac": "node prepare.js && electron-builder --mac dmg --x64 --arm64 --publish never",
+    "dist:linux": "node prepare.js && electron-builder --linux AppImage --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.andify.desktop",
+    "productName": "Andify",
+    "files": [
+      "main.js",
+      "preload.js",
+      "titlebar.js",
+      "build/**"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "Andify-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Andify"
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.music",
+      "icon": "build/icon.png",
+      "artifactName": "Andify-${version}-${arch}.${ext}",
+      "identity": null,
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Audio",
+      "icon": "build/icon.png",
+      "artifactName": "Andify-${version}.${ext}"
+    },
+    "extraResources": [
+      {
+        "from": "build/icon.ico",
+        "to": "icon.ico"
+      },
+      {
+        "from": "build/tray.png",
+        "to": "tray.png"
+      },
+      {
+        "from": "build/icon.png",
+        "to": "icon.png"
+      }
+    ],
+    "afterPack": "afterpack.js"
+  }
+}
