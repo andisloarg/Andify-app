@@ -1,0 +1,70 @@
+# Compila los instaladores de Andify en la nube de GitHub.
+#
+# - Cada vez que subis cambios se arman Windows y Mac.
+# - Linux es opcional: pestana Actions -> Build Andify installers -> Run workflow ->
+#   marcar "Armar tambien Linux".
+name: Build Andify installers
+
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      linux:
+        description: 'Armar tambien Linux'
+        type: boolean
+        default: false
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Instalar dependencias
+        run: npm install
+      - name: Compilar el instalador
+        run: npm run dist
+      - name: Guardar el instalador
+        uses: actions/upload-artifact@v4
+        with:
+          name: andify-windows
+          path: dist/*.exe
+
+  mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Instalar dependencias
+        run: npm install
+      - name: Compilar el instalador (chip Apple e Intel)
+        run: npm run dist:mac
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+      - name: Guardar el instalador
+        uses: actions/upload-artifact@v4
+        with:
+          name: andify-mac
+          path: dist/*.dmg
+
+  linux:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.linux }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Instalar dependencias
+        run: npm install
+      - name: Compilar el instalador
+        run: npm run dist:linux
+      - name: Guardar el instalador
+        uses: actions/upload-artifact@v4
+        with:
+          name: andify-linux
+          path: dist/*.AppImage
