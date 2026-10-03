@@ -1,6 +1,6 @@
 {
   "name": "andify",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Andify, tu musica en un reproductor propio",
   "main": "main.js",
   "author": "Andify",
@@ -23,6 +23,7 @@
       "preload.js",
       "titlebar.js",
       "macmenu.js",
+      "menu-i18n.json",
       "build/**"
     ],
     "win": {

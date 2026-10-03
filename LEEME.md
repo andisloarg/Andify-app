@@ -65,6 +65,14 @@ doble clic se maximiza.
 - **Mac**: los tres botones de colores quedan a la izquierda y el nombre en el centro. En pantalla completa
   la barra se esconde.
 
+## Idioma
+
+Andify habla 15 idiomas: ingles, espanol, portugues, frances, aleman, italiano, neerlandes, polaco, ruso,
+turco, chino, japones, coreano, hindi y esloveno. Se elige en **Ajustes → Language**; por defecto usa el idioma
+del sistema. Se guarda en cada dispositivo (un telefono puede estar en esloveno y la compu en espanol).
+En el programa de escritorio tambien cambian el menu del icono de la bandeja y el menu de Mac.
+Los titulos de tu musica, los artistas y las letras nunca se traducen.
+
 ## Ajustes: compartidos o solo en este dispositivo
 
 Por defecto los ajustes (skin, orden de las secciones, wallpaper, etc.) se guardan en tu NAS y todos tus

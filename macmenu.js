@@ -6,6 +6,7 @@
 const { Menu } = require('electron');
 
 function construir(h) {
+  const T = h.T || (s => s);
   // h.ejecutar(codigo): corre una orden dentro de la pagina de Andify
   const orden = codigo => () => h.ejecutar(codigo);
   const accion = (nombre, arg) => orden(`typeof act==='function'&&act('${nombre}'${arg ? ",'" + arg + "'" : ''})`);
@@ -16,54 +17,54 @@ function construir(h) {
     {
       label: 'Andify',
       submenu: [
-        { label: 'About Andify', role: 'about' },
+        { label: T('About Andify'), role: 'about' },
         { type: 'separator' },
-        { label: 'Settings…', accelerator: 'CommandOrControl+,', click: accion('tab', 'settings') },
+        { label: T('Settings…'), accelerator: 'CommandOrControl+,', click: accion('tab', 'settings') },
         { type: 'separator' },
-        { label: 'Hide Andify', role: 'hide' },
+        { label: T('Hide Andify'), role: 'hide' },
         { role: 'hideOthers' },
         { role: 'unhide' },
         { type: 'separator' },
-        { label: 'Quit Andify', role: 'quit' }
+        { label: T('Quit Andify'), role: 'quit' }
       ]
     },
     {
-      label: 'Library',
+      label: T('Library'),
       submenu: [
-        { id: 'scan', label: 'Scan for new files', accelerator: 'Shift+CommandOrControl+S', click: accion('scanlib') },
-        { id: 'deep', label: 'Deep scan', click: accion('scandeep') },
+        { id: 'scan', label: T('Scan for new files'), accelerator: 'Shift+CommandOrControl+S', click: accion('scanlib') },
+        { id: 'deep', label: T('Deep scan'), click: accion('scandeep') },
         { type: 'separator' },
-        { label: 'Clean refresh', accelerator: 'Shift+CommandOrControl+R', click: accion('cleanrefresh') },
-        { label: 'Connect to Plex or choose a folder…', click: accion('setup') }
+        { label: T('Clean refresh'), accelerator: 'Shift+CommandOrControl+R', click: accion('cleanrefresh') },
+        { label: T('Connect to Plex or choose a folder…'), click: accion('setup') }
       ]
     },
     {
-      label: 'Playback',
+      label: T('Playback'),
       submenu: [
-        { label: 'Play / Pause', accelerator: 'Alt+CommandOrControl+P', click: orden("typeof toggle==='function'&&toggle()") },
-        { label: 'Next', accelerator: 'Alt+CommandOrControl+Right', click: orden("typeof next==='function'&&next(false)") },
-        { label: 'Previous', accelerator: 'Alt+CommandOrControl+Left', click: orden("typeof prev==='function'&&prev()") },
+        { label: T('Play / Pause'), accelerator: 'Alt+CommandOrControl+P', click: orden("typeof toggle==='function'&&toggle()") },
+        { label: T('Next'), accelerator: 'Alt+CommandOrControl+Right', click: orden("typeof next==='function'&&next(false)") },
+        { label: T('Previous'), accelerator: 'Alt+CommandOrControl+Left', click: orden("typeof prev==='function'&&prev()") },
         { type: 'separator' },
-        { label: 'Volume Up', accelerator: 'Alt+CommandOrControl+Up', click: volumen(5) },
-        { label: 'Volume Down', accelerator: 'Alt+CommandOrControl+Down', click: volumen(-5) },
+        { label: T('Volume Up'), accelerator: 'Alt+CommandOrControl+Up', click: volumen(5) },
+        { label: T('Volume Down'), accelerator: 'Alt+CommandOrControl+Down', click: volumen(-5) },
         { type: 'separator' },
-        { label: 'Show Now Playing', click: orden("typeof openNp==='function'&&openNp()") },
-        { label: 'Show Lyrics', accelerator: 'CommandOrControl+L', click: accion('lyrics') }
+        { label: T('Show Now Playing'), click: orden("typeof openNp==='function'&&openNp()") },
+        { label: T('Show Lyrics'), accelerator: 'CommandOrControl+L', click: accion('lyrics') }
       ]
     },
     {
-      label: 'Go',
+      label: T('Go'),
       submenu: [
-        { label: 'Home', accelerator: 'CommandOrControl+1', click: accion('tab', 'home') },
-        { label: 'Search', accelerator: 'CommandOrControl+2', click: accion('tab', 'search') },
-        { label: 'Playlists', accelerator: 'CommandOrControl+3', click: accion('tab', 'playlists') }
+        { label: T('Home'), accelerator: 'CommandOrControl+1', click: accion('tab', 'home') },
+        { label: T('Search'), accelerator: 'CommandOrControl+2', click: accion('tab', 'search') },
+        { label: T('Playlists'), accelerator: 'CommandOrControl+3', click: accion('tab', 'playlists') }
       ]
     },
     { role: 'editMenu' },
     {
-      label: 'View',
+      label: T('View'),
       submenu: [
-        { label: 'Reload', accelerator: 'CommandOrControl+R', click: () => h.recargar() },
+        { label: T('Reload'), accelerator: 'CommandOrControl+R', click: () => h.recargar() },
         { type: 'separator' },
         { role: 'resetZoom' },
         { role: 'zoomIn' },
@@ -74,9 +75,9 @@ function construir(h) {
     },
     { role: 'windowMenu' },
     {
-      label: 'Help',
+      label: T('Help'),
       role: 'help',
-      submenu: [{ label: 'Developer Tools', accelerator: 'Alt+CommandOrControl+I', click: () => h.consola() }]
+      submenu: [{ label: T('Developer Tools'), accelerator: 'Alt+CommandOrControl+I', click: () => h.consola() }]
     }
   ]);
 }

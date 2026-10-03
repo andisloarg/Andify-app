@@ -31,6 +31,12 @@ de Plex ni los botones de transmitir.
 **Bandeja:** Andify deja un icono junto al reloj. Si cerrás la ventana con la X, la música sigue sonando.
 Para cerrarlo de verdad, clic derecho sobre el icono → **Quit Andify**.
 
+**Portadas y artistas de tu carpeta:** Andify lee las etiquetas de tus archivos y busca en internet las portadas que
+falten y la foto de cada artista. Si se equivoca, en el disco o artista toca **Change cover / Change photo** para
+buscar otra, subir la tuya o pegar una direccion. Se puede apagar en Ajustes → Artwork from the internet.
+
+**Idioma:** Andify usa el idioma de tu sistema. Para cambiarlo: **Ajustes → Idioma** (hay 15 idiomas, incluido el esloveno).
+
 **Atajos:** F11 pantalla completa · Ctrl+R recargar · Ctrl+Shift+U cambiar dónde abre Andify.
 
 ## English
@@ -64,3 +70,9 @@ Without Plex, Andify shows only what works with your folder: Sonic AI, the mixes
 
 **Tray:** Andify leaves an icon next to the clock. If you close the window with the X, the music keeps playing.
 To really close it, right-click the icon → **Quit Andify**.
+
+**Covers and artists for your folder:** Andify reads your files' tags and looks up missing covers and each artist's photo
+on the internet. If it gets one wrong, open the album or artist and tap **Change cover / Change photo** to search again,
+upload your own or paste an address. You can turn it off in Settings → Artwork from the internet.
+
+**Language:** Andify uses your system language. To change it: **Settings → Language** (15 languages, including Slovenian).

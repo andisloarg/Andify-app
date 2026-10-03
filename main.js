@@ -12,6 +12,7 @@ const path = require('path');
 const fs = require('fs');
 const barra = require('./titlebar.js');
 const macmenu = require('./macmenu.js');
+const textosMenu = require('./menu-i18n.json');
 
 // el nombre que se ve en los menus y en el Dock (si no, Mac usa el nombre del paquete, en minusculas)
 app.setName('Andify');
@@ -61,6 +62,9 @@ function log(m) {
 }
 
 let ventana = null;
+// los menus salen en el idioma que elegiste dentro de Andify (la app avisa cual es)
+let idioma = 'en';
+const T = s => (idioma !== 'en' && textosMenu[idioma] && textosMenu[idioma][s]) || s;
 let colorBarra = '';
 const MAC = process.platform === 'darwin';
 const CON_BARRA = process.platform === 'win32' || MAC;   // barra de titulo propia, con el color de la skin
@@ -97,6 +101,21 @@ async function refrescarBarra() {
   guardar({ tb: r.c, ts: simbolo });
 }
 
+function menuBandeja() {
+  return Menu.buildFromTemplate([
+    { label: T('Open Andify'), click: mostrar },
+    { type: 'separator' },
+    { label: T('Play / Pause'), click: () => js("typeof toggle==='function'&&toggle()") },
+    { label: T('Next'), click: () => js("typeof next==='function'&&next(false)") },
+    { label: T('Previous'), click: () => js("typeof prev==='function'&&prev()") },
+    { type: 'separator' },
+    { label: T('Closing the window keeps Andify in the tray'), type: 'checkbox', checked: enBandeja(),
+      click: i => guardar({ bandeja: i.checked }) },
+    { type: 'separator' },
+    { label: T('Quit Andify'), click: () => { saliendo = true; app.quit(); } }
+  ]);
+}
+
 function crearBandeja() {
   // El icono se busca en varios lugares, del mas seguro al menos seguro. Los archivos de
   // "recursos" quedan fuera del paquete comprimido, que es donde Windows los lee sin problemas.
@@ -129,18 +148,7 @@ function crearBandeja() {
   try { const t = img.getSize(); log('icono de la bandeja: ' + fuente + ' (' + t.width + 'x' + t.height + ')'); } catch (e) {}
   bandeja = new Tray(img);
   bandeja.setToolTip('Andify ' + app.getVersion());
-  bandeja.setContextMenu(Menu.buildFromTemplate([
-    { label: 'Open Andify', click: mostrar },
-    { type: 'separator' },
-    { label: 'Play / Pause', click: () => js("typeof toggle==='function'&&toggle()") },
-    { label: 'Next', click: () => js("typeof next==='function'&&next(false)") },
-    { label: 'Previous', click: () => js("typeof prev==='function'&&prev()") },
-    { type: 'separator' },
-    { label: 'Closing the window keeps Andify in the tray', type: 'checkbox', checked: enBandeja(),
-      click: i => guardar({ bandeja: i.checked }) },
-    { type: 'separator' },
-    { label: 'Quit Andify', click: () => { saliendo = true; app.quit(); } }
-  ]));
+  bandeja.setContextMenu(menuBandeja());
   // un clic muestra u oculta la ventana; doble clic la abre
   bandeja.on('click', () => { if (ventana.isVisible() && ventana.isFocused()) ventana.hide(); else mostrar(); });
   bandeja.on('double-click', mostrar);
@@ -280,6 +288,15 @@ async function cambiarDireccion() {
   cargar(ventana);
 }
 
+// cada tanto se pregunta en que idioma esta Andify; si cambio, se rearman los menus
+async function vigilarIdioma() {
+  const L = await js("typeof i18nLang==='function'?i18nLang():'en'");
+  if (typeof L !== 'string' || L === idioma) return;
+  idioma = L;
+  if (bandeja) { try { bandeja.setContextMenu(menuBandeja()); } catch (e) {} }
+  if (MAC && global.__menuMac) { try { global.__menuMac.reconstruir(); } catch (e) {} }
+}
+
 app.on('second-instance', mostrar);
 app.on('activate', mostrar);   // Mac: un clic en el Dock vuelve a abrir la ventana
 app.on('before-quit', () => { saliendo = true; });
@@ -289,17 +306,21 @@ app.whenReady().then(() => {
   if (process.platform === 'darwin') {
     // en Mac el menu trae copiar y pegar, Cmd+Q y las funciones de Andify
     const h = {
+      T,
       ejecutar: js,
       recargar: () => { if (ventana) ventana.reload(); },
       consola: () => { if (ventana) ventana.webContents.toggleDevTools(); }
     };
     Menu.setApplicationMenu(macmenu.construir(h));
     setInterval(() => macmenu.estado(h), 3000);
+    h.reconstruir = () => Menu.setApplicationMenu(macmenu.construir(h));
+    global.__menuMac = h;
   } else {
     Menu.setApplicationMenu(null);
   }
   crear();
   try { crearBandeja(); } catch (e) { bandeja = null; log('bandeja: error ' + e.message); }
+  setInterval(vigilarIdioma, 2000);
 });
 
 app.on('window-all-closed', () => app.quit());
