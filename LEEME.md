@@ -56,10 +56,45 @@ En Windows el icono puede quedar escondido en la flecha **^**: arrastralo a la b
 
 ## La barra de titulo
 
-En Windows, la barra de arriba de la ventana (el nombre y los botones minimizar, maximizar y cerrar)
-toma el color del fondo de la skin: con **Ultra black** queda negra, con las claras queda clara, y los
-botones cambian a blanco o a oscuro para que se lean. Se actualiza sola al cambiar de skin.
-Se arrastra desde ahi para mover la ventana y con doble clic se maximiza.
+La barra de arriba de la ventana toma el color del fondo de la skin: con **Ultra black** queda negra, con las
+claras queda clara. Se actualiza sola al cambiar de skin. Se arrastra desde ahi para mover la ventana y con
+doble clic se maximiza.
+
+- **Windows**: el nombre queda a la izquierda y los botones minimizar, maximizar y cerrar a la derecha, en el
+  mismo color, y cambian a blanco o a oscuro para que se lean.
+- **Mac**: los tres botones de colores quedan a la izquierda y el nombre en el centro. En pantalla completa
+  la barra se esconde.
+
+## Ajustes: compartidos o solo en este dispositivo
+
+Por defecto los ajustes (skin, orden de las secciones, wallpaper, etc.) se guardan en tu NAS y todos tus
+dispositivos los comparten. En **Ajustes → Settings sync** cada dispositivo puede elegir **This device only**:
+deja de enviar y de recibir ajustes y conserva los suyos. Al volver a **Shared with my devices** pregunta
+cual manda: los del NAS (OK) o los de este dispositivo (Cancelar).
+
+## El menu de Mac
+
+En Mac el menu de arriba tiene las cosas de Andify (no el menu generico con "Servicios"):
+
+| Menu | Que tiene |
+|---|---|
+| **Andify** | About, Settings… (⌘,), Hide, Quit |
+| **Library** | Scan for new files (⇧⌘S), Deep scan, Clean refresh (⇧⌘R), Connect to Plex or choose a folder… |
+| **Playback** | Play / Pause (⌥⌘P), Next (⌥⌘→), Previous (⌥⌘←), Volume Up y Down (⌥⌘↑ ↓), Show Now Playing, Show Lyrics (⌘L) |
+| **Go** | Home (⌘1), Search (⌘2), Playlists (⌘3) |
+| **Edit, View, Window, Help** | Copiar y pegar, zoom y pantalla completa, ventana, consola de errores |
+
+Scan for new files y Deep scan se apagan solos cuando no hay Plex conectado.
+El nombre en los menus es **Andify** (antes salia en minusculas).
+
+## Iconos
+
+- **Windows y Linux**: `build/icon.ico` y `build/icon.png`: un circulo blanco con las barras negras y el fondo transparente.
+  El icono de la bandeja (`build/tray.png`) es el mismo.
+- **Mac**: `build/icon-mac.png`, un cuadrado redondeado blanco con las barras negras, con el margen
+  transparente que usan los iconos de Mac para verse del mismo tamano que los demas del Dock.
+- **Barra de menu de Mac**: `build/trayTemplate.png` y `trayTemplate@2x.png`, solo las barras sobre
+  transparente. El sistema las pinta de blanco o negro segun el modo claro u oscuro.
 
 ## Nombres de las carpetas (importante)
 

@@ -1,6 +1,6 @@
 {
   "name": "andify",
-  "version": "1.0.3",
+  "version": "1.0.6",
   "description": "Andify, tu musica en un reproductor propio",
   "main": "main.js",
   "author": "Andify",
@@ -22,6 +22,7 @@
       "main.js",
       "preload.js",
       "titlebar.js",
+      "macmenu.js",
       "build/**"
     ],
     "win": {
@@ -44,7 +45,7 @@
         "dmg"
       ],
       "category": "public.app-category.music",
-      "icon": "build/icon.png",
+      "icon": "build/icon-mac.png",
       "artifactName": "Andify-${version}-${arch}.${ext}",
       "identity": null,
       "hardenedRuntime": false,
@@ -70,8 +71,17 @@
       {
         "from": "build/icon.png",
         "to": "icon.png"
+      },
+      {
+        "from": "build/trayTemplate.png",
+        "to": "trayTemplate.png"
+      },
+      {
+        "from": "build/trayTemplate@2x.png",
+        "to": "trayTemplate@2x.png"
       }
     ],
     "afterPack": "afterpack.js"
-  }
+  },
+  "productName": "Andify"
 }

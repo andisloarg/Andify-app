@@ -1568,7 +1568,7 @@ try{cfg=JSON.parse(localStorage.getItem('surco')||'{}')}catch(e){}
 if(!cfg.clientId)cfg.clientId='andimusic-'+Math.random().toString(36).slice(2)+Date.now().toString(36);
 const save=()=>{try{localStorage.setItem('surco',JSON.stringify(cfg))}catch(e){}};
 const BUILD='2026-10-03 · TV 109';
-const AI_DEFAULT='http://192.168.50.54:5765/#home';
+const AI_DEFAULT='';
 if(!cfg.aiUrl)cfg.aiUrl=AI_DEFAULT;
 save();
 let mode=null, local=null;
@@ -4120,7 +4120,7 @@ const VIEWS={
         <div class="msg" id="brmsg"></div>
         ${cfg.bridgeUrl?`<p class="msg">Your settings (WiiM, AI playlists, cover size, vinyl, library and lyrics) are kept on the NAS, so any other device picks them up on its own. Volume and this address stay per device.</p>`:''}</div>`:''}
       ${mode==='plex'?`      <div class="set"><h2>WiiM</h2><p>Send music straight to your WiiM in the original quality of the file. You can find its IP address in the WiiM Home app, in the device settings.</p>
-        <div class="aiurl"><input type="text" id="wiimip" value="${esc(cfg.wiimIp||'')}" placeholder="IP address, for example 192.168.50.30" aria-label="WiiM IP address">
+        <div class="aiurl"><input type="text" id="wiimip" value="${esc(cfg.wiimIp||'')}" placeholder="IP address, for example 192.168.1.30" aria-label="WiiM IP address">
         <input type="text" id="wiimname" value="${esc(cfg.wiimName||'')}" placeholder="Name, for example WiiM Ultra" aria-label="WiiM name" style="flex:1 1 180px">
         <button class="btn ghost" data-act="wiimsave">Save</button></div>
         ${cfg.wiimIp?`<div class="btns" style="margin-top:12px"><a class="btn ghost" href="https://${esc(cfg.wiimIp)}/httpapi.asp?command=getStatusEx" target="_blank" rel="noopener">Authorize the WiiM</a>
