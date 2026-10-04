@@ -1,5 +1,3 @@
-# Compila el APK de Andify para Android en la nube y lo deja listo para bajar.
-# Subi esta carpeta a un repositorio de GitHub y la accion corre sola.
 name: Build Andify Android APK
 
 on:
@@ -12,17 +10,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Encontrar el proyecto
+        id: proy
+        run: |
+          F=$(find . -maxdepth 4 -name settings.gradle -not -path '*/node_modules/*' | head -n 1)
+          if [ -z "$F" ]; then
+            echo "No encuentro settings.gradle en el repositorio. Esto es lo que hay:"
+            find . -maxdepth 3 -not -path './.git/*' | head -n 60
+            exit 1
+          fi
+          DIR=$(dirname "$F")
+          echo "Proyecto en: $DIR"
+          echo "dir=$DIR" >> "$GITHUB_OUTPUT"
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      # Las maquinas de GitHub ya traen el SDK de Android: solo se aceptan las licencias
-      # y se asegura que esten las piezas que usa la app.
       - name: Preparar el SDK de Android
         run: |
           SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
-          echo "SDK en: $SDK"
           SM="$SDK/cmdline-tools/latest/bin/sdkmanager"
           yes | "$SM" --licenses > /dev/null || true
           "$SM" "platforms;android-34" "build-tools;34.0.0" || true
@@ -32,13 +40,15 @@ jobs:
           gradle-version: '8.7'
 
       - name: Compilar
+        working-directory: ${{ steps.proy.outputs.dir }}
         run: gradle assembleDebug --no-daemon
 
       - name: Dejar el APK con un nombre claro
+        working-directory: ${{ steps.proy.outputs.dir }}
         run: cp app/build/outputs/apk/debug/app-debug.apk Andify.apk
 
       - name: Guardar el APK
         uses: actions/upload-artifact@v4
         with:
           name: andify-android-apk
-          path: Andify.apk
+          path: ${{ steps.proy.outputs.dir }}/Andify.apk
