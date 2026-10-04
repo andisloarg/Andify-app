@@ -1,70 +1,44 @@
-# Compila los instaladores de Andify en la nube de GitHub.
-#
-# - Cada vez que subis cambios se arman Windows y Mac.
-# - Linux es opcional: pestana Actions -> Build Andify installers -> Run workflow ->
-#   marcar "Armar tambien Linux".
-name: Build Andify installers
+# Compila el APK de Andify para Android en la nube y lo deja listo para bajar.
+# Subi esta carpeta a un repositorio de GitHub y la accion corre sola.
+name: Build Andify Android APK
 
 on:
   push:
   workflow_dispatch:
-    inputs:
-      linux:
-        description: 'Armar tambien Linux'
-        type: boolean
-        default: false
 
 jobs:
-  windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - name: Instalar dependencias
-        run: npm install
-      - name: Compilar el instalador
-        run: npm run dist
-      - name: Guardar el instalador
-        uses: actions/upload-artifact@v4
-        with:
-          name: andify-windows
-          path: dist/*.exe
-
-  mac:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - name: Instalar dependencias
-        run: npm install
-      - name: Compilar el instalador (chip Apple e Intel)
-        run: npm run dist:mac
-        env:
-          CSC_IDENTITY_AUTO_DISCOVERY: false
-      - name: Guardar el instalador
-        uses: actions/upload-artifact@v4
-        with:
-          name: andify-mac
-          path: dist/*.dmg
-
-  linux:
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.linux }}
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+
+      - uses: actions/setup-java@v4
         with:
-          node-version: '20'
-      - name: Instalar dependencias
-        run: npm install
-      - name: Compilar el instalador
-        run: npm run dist:linux
-      - name: Guardar el instalador
+          distribution: temurin
+          java-version: '17'
+
+      # Las maquinas de GitHub ya traen el SDK de Android: solo se aceptan las licencias
+      # y se asegura que esten las piezas que usa la app.
+      - name: Preparar el SDK de Android
+        run: |
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          echo "SDK en: $SDK"
+          SM="$SDK/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SM" --licenses > /dev/null || true
+          "$SM" "platforms;android-34" "build-tools;34.0.0" || true
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Compilar
+        run: gradle assembleDebug --no-daemon
+
+      - name: Dejar el APK con un nombre claro
+        run: cp app/build/outputs/apk/debug/app-debug.apk Andify.apk
+
+      - name: Guardar el APK
         uses: actions/upload-artifact@v4
         with:
-          name: andify-linux
-          path: dist/*.AppImage
+          name: andify-android-apk
+          path: Andify.apk
