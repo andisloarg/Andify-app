@@ -66,6 +66,7 @@ let ventana = null;
 let idioma = 'en';
 const T = s => (idioma !== 'en' && textosMenu[idioma] && textosMenu[idioma][s]) || s;
 let colorBarra = '';
+let barraNativa = false;   // true cuando la propia pagina dibuja su barra
 const MAC = process.platform === 'darwin';
 const CON_BARRA = process.platform === 'win32' || MAC;   // barra de titulo propia, con el color de la skin
 let bandeja = null;      // el icono junto al reloj; se guarda en una variable para que no lo borre el sistema
@@ -89,16 +90,30 @@ async function js(codigo) {
   try { return await ventana.webContents.executeJavaScript(codigo, true); } catch (e) { return null; }
 }
 
-// la barra de titulo copia el color de fondo de la skin: se revisa cada tanto y se actualiza solo si cambio
+function aplicarColorBarra(color, claro) {
+  if (!CON_BARRA || !ventana || ventana.isDestroyed() || !/^#[0-9a-f]{6}$/i.test(color || '') || color === colorBarra) return;
+  colorBarra = color;
+  const simbolo = claro ? '#14121a' : '#ffffff';
+  if (ventana.setTitleBarOverlay && !MAC) { try { ventana.setTitleBarOverlay({ color, symbolColor: simbolo, height: barra.ALTO }); } catch (e) {} }
+  try { ventana.setBackgroundColor(color); } catch (e) {}
+  guardar({ tb: color, ts: simbolo });
+}
+
+function alternarPantallaCompleta() {
+  if (ventana && !ventana.isDestroyed()) ventana.setFullScreen(!ventana.isFullScreen());
+}
+
+// respaldo: si la pagina no trae su propia barra (por ejemplo una copia vieja en tu NAS), se inyecta desde aca
 async function refrescarBarra() {
-  if (!CON_BARRA || !ventana || ventana.isDestroyed() || !ventana.isVisible()) return;
-  const r = await js(barra.REFRESCAR);
-  if (!r || !r.c || r.c === colorBarra) return;
-  colorBarra = r.c;
-  const simbolo = r.light ? '#14121a' : '#ffffff';
-  if (ventana.setTitleBarOverlay && !MAC) { try { ventana.setTitleBarOverlay({ color: r.c, symbolColor: simbolo, height: barra.ALTO }); } catch (e) {} }
-  try { ventana.setBackgroundColor(r.c); } catch (e) {}
-  guardar({ tb: r.c, ts: simbolo });
+  if (!CON_BARRA || barraNativa || !ventana || ventana.isDestroyed() || !ventana.isVisible()) return;
+  let r = await js(barra.REFRESCAR);
+  if (r === null) {
+    // la barra no esta (se perdio o nunca llego): se vuelve a poner
+    try { await ventana.webContents.insertCSS(barra.CSS); } catch (e) {}
+    await js(barra.iniciar(ICONO_BANDEJA, MAC));
+    r = await js(barra.REFRESCAR);
+  }
+  if (r && r.c) aplicarColorBarra(r.c, r.light);
 }
 
 function menuBandeja() {
@@ -206,16 +221,23 @@ function crear() {
 
   if (CON_BARRA) {
     ventana.webContents.on('did-finish-load', async () => {
+      barraNativa = (await js("window.__dtNative===true")) === true;
+      log('barra de la ventana: ' + (barraNativa ? 'la dibuja la pagina' : 'inyectada desde el programa'));
+      if (barraNativa) return;
       try { await ventana.webContents.insertCSS(barra.CSS); } catch (e) {}
       await js(barra.iniciar(ICONO_BANDEJA, MAC));
       colorBarra = '';
       await refrescarBarra();
     });
     setInterval(refrescarBarra, 1500);
-    // Mac: en pantalla completa la barra de titulo se esconde
-    ventana.on('enter-full-screen', () => js(barra.pantallaCompleta(true)));
-    ventana.on('leave-full-screen', () => js(barra.pantallaCompleta(false)));
   }
+  // pantalla completa: la pagina se entera para esconder su barra y cambiar el icono
+  const avisoFs = v => {
+    try { ventana.webContents.send('andify-fs', v); } catch (e) {}
+    if (CON_BARRA && !barraNativa) js(barra.pantallaCompleta(v));
+  };
+  ventana.on('enter-full-screen', () => avisoFs(true));
+  ventana.on('leave-full-screen', () => avisoFs(false));
 
   ventana.on('close', e => {
     const b = ventana.getNormalBounds();
@@ -244,7 +266,8 @@ function crear() {
   ventana.webContents.on('before-input-event', (e, i) => {
     if (i.type !== 'keyDown') return;
     const ctrl = i.control || i.meta;
-    if (i.key === 'F11') { ventana.setFullScreen(!ventana.isFullScreen()); e.preventDefault(); }
+    if (i.key === 'F11') { alternarPantallaCompleta(); e.preventDefault(); }
+    else if (i.key === 'Escape' && ventana.isFullScreen()) { ventana.setFullScreen(false); }
     else if (ctrl && !i.shift && i.key.toLowerCase() === 'r') { ventana.reload(); e.preventDefault(); }
     else if (ctrl && i.shift && i.key.toLowerCase() === 'r') { ventana.webContents.reloadIgnoringCache(); e.preventDefault(); }
     else if (ctrl && i.shift && i.key.toLowerCase() === 'i') { ventana.webContents.toggleDevTools(); e.preventDefault(); }
@@ -296,6 +319,10 @@ async function vigilarIdioma() {
   if (bandeja) { try { bandeja.setContextMenu(menuBandeja()); } catch (e) {} }
   if (MAC && global.__menuMac) { try { global.__menuMac.reconstruir(); } catch (e) {} }
 }
+
+ipcMain.on('andify-fs-toggle', alternarPantallaCompleta);
+ipcMain.handle('andify-fs-get', () => !!(ventana && !ventana.isDestroyed() && ventana.isFullScreen()));
+ipcMain.on('andify-title-color', (_e, color, claro) => aplicarColorBarra(color, claro));
 
 app.on('second-instance', mostrar);
 app.on('activate', mostrar);   // Mac: un clic en el Dock vuelve a abrir la ventana

@@ -54,9 +54,16 @@ Un clic en el icono muestra u oculta la ventana, y al pasar el mouse por encima 
 En Linux la X cierra el programa de fabrica, porque algunos escritorios no muestran la bandeja.
 En Windows el icono puede quedar escondido en la flecha **^**: arrastralo a la barra para dejarlo fijo.
 
+## Pantalla completa
+
+Hay un boton de pantalla completa arriba a la derecha: en la barra de la ventana (Windows y Mac), en la
+pantalla de reproduccion y, en el navegador, como una pastilla discreta en la esquina. En pantalla completa la barra se
+esconde y aparece una pastilla para volver cuando movés el mouse. Tambien funcionan **F11** y **Esc**.
+Se puede quitar en **Ajustes → Buttons and badges → Full screen button** (por dispositivo).
+
 ## La barra de titulo
 
-La barra de arriba de la ventana toma el color del fondo de la skin: con **Ultra black** queda negra, con las
+La barra de arriba de la ventana la dibuja la propia pagina y toma el color del fondo de la skin: con **Ultra black** queda negra, con las
 claras queda clara. Se actualiza sola al cambiar de skin. Se arrastra desde ahi para mover la ventana y con
 doble clic se maximiza.
 

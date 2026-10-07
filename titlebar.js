@@ -12,7 +12,7 @@ const ALTO = process.platform === 'darwin' ? 32 : 36;
 
 const CSS = `
 html[data-dt] body{padding-top:${ALTO}px!important;box-sizing:border-box!important}
-html[data-dt] .app{height:calc(100dvh - ${ALTO}px)!important}
+html[data-dt] .app{height:calc(var(--appvh,100vh) - ${ALTO}px)!important}
 html[data-dt] #np,html[data-dt] #npm,html[data-dt] #setup,html[data-dt] #aifull,html[data-dt] .sheet{top:${ALTO}px!important}
 #dtbar{position:fixed;top:0;left:0;right:0;height:${ALTO}px;z-index:2147483000;
   -webkit-app-region:drag;display:flex;align-items:center;gap:9px;padding:0 0 0 12px;
@@ -22,7 +22,7 @@ html[data-dt] #np,html[data-dt] #npm,html[data-dt] #setup,html[data-dt] #aifull,
 html[data-dtmac] #dtbar{justify-content:center;padding:0 90px}
 /* pantalla completa: la barra desaparece y la app ocupa todo */
 html[data-dtfs] body{padding-top:0!important}
-html[data-dtfs] .app{height:100dvh!important}
+html[data-dtfs] .app{height:var(--appvh,100vh)!important}
 html[data-dtfs] #np,html[data-dtfs] #npm,html[data-dtfs] #setup,html[data-dtfs] #aifull,html[data-dtfs] .sheet{top:0!important}
 html[data-dtfs] #dtbar{display:none}
 `;
@@ -31,14 +31,13 @@ html[data-dtfs] #dtbar{display:none}
 const REFRESCAR = `(function(){
   var d=document,b=d.getElementById('dtbar');
   if(!b)return null;
-  function fondo(){
-    var c=getComputedStyle(d.body).backgroundColor;
-    if(!c||c==='transparent'||/,\\s*0\\)$/.test(c))c=getComputedStyle(d.documentElement).backgroundColor;
-    return c;
-  }
-  var c=fondo(),m=c.match(/[\\d.]+/g)||[0,0,0];
-  var r=+m[0],g=+m[1],bl=+m[2],lum=(0.2126*r+0.7152*g+0.0722*bl)/255;
-  b.style.background=c;
+  var i=d.createElement('i');
+  i.style.cssText='position:fixed;left:-9px;top:0;width:1px;height:1px;background:var(--bg);pointer-events:none';
+  d.body.appendChild(i);var c=getComputedStyle(i).backgroundColor;i.remove();
+  var m=(c.match(/[\\d.]+/g)||[]).map(Number),r=m[0],g=m[1],bl=m[2];
+  if(m.length<3||(m.length>3&&m[3]===0)){r=23;g=19;bl=31}
+  var lum=(0.2126*r+0.7152*g+0.0722*bl)/255;
+  b.style.background='rgb('+r+','+g+','+bl+')';
   b.style.color=lum>0.55?'rgba(20,18,26,.85)':'rgba(255,255,255,.86)';
   var h='#'+[r,g,bl].map(function(v){return Math.round(v).toString(16).padStart(2,'0')}).join('');
   return {c:h,light:lum>0.55};
